@@ -1,16 +1,11 @@
 class AppStrings {
   //Onboarding Screens
-  static const String onboardHeading1 = 'Your moments, your way';
-  static const String onboardHeading2 = 'Create memories together';
-  static const String onboardHeading3 = 'Connect beyond borders';
-  static const String onboardDescription1 = 'Vibly — Where Stories Begin';  
-  static const String onboardDescription2 = 'Scroll Less, Feel More';
-  static const String onboardDescription3 = 'Real People — Real Moments';
+  static const String onboardHeading1 = 'Talent is everywhere, Find it with Talento';
+  static const String onboardHeading2 = 'Create, Connect, Collaborate. All on Talento';
   //Login Screen
   static const String loginHeading = "Welcome back! Glad to see you again.";  
   //Signup Screen
-  static const String signupHeading = "Hello there! Ready to join us?";
-  static const String signupDescription = "Create your account to start sharing and connecting with friends and family.";
+  static const String signupHeading = "Hello! Register to get started";
   //Set new Password Screen
   static const String setNewPassword = "Create a strong password with a minimum of 8 characters. For better security, include a mix of letters, numbers, and symbols. Learn more";
   //Forgot Password Screen

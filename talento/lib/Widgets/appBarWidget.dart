@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:talento/Utils/appColors.dart';
-import 'package:talento/Widgets/gradientText.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -16,79 +15,47 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    const gradient = AppColors.gradient;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppBar(
-          backgroundColor: AppColors.white,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          toolbarHeight: 58,
-          leadingWidth: showBackButton ? 90 : 0,
-          leading: showBackButton
-              ? GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 12),
-                      ShaderMask(
-                        shaderCallback: (bounds) => gradient.createShader(bounds),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          size: 18,
-                          color: Colors.white, // Ignored by ShaderMask
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      ShaderMask(
-                        shaderCallback: (bounds) => gradient.createShader(bounds),
-                        child: const Text(
-                          'Back',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white, // Ignored by ShaderMask
-                          ),
-                        ),
-                      ),
-                    ],
+    return SafeArea(
+      child: Container(
+        color: AppColors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            if (showBackButton)
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.white,
+                    border: Border.all(color: AppColors.grey)
                   ),
-                )
-              : null,
-          title: GradientText(
-            text: title,
-            style: const TextStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          actions: [
-            if (action != null)
-              Padding(
-                padding: const EdgeInsets.only(right: 12.0),
-                child: action,
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    size: 18,
+                    color: Colors.black,
+                  ),
+                ),
               ),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            const Spacer(),
+            if (action != null) action!,
           ],
         ),
-
-        // Gradient bottom line under AppBar
-        Container(
-          height: 2,
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: const BoxDecoration(
-            gradient: AppColors.gradient,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(58);
+  Size get preferredSize => const Size.fromHeight(70);
 }

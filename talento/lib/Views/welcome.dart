@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:talento/Utils/appColors.dart';
-import 'package:talento/Utils/appFonts.dart';
 import 'package:talento/Widgets/gradientButton.dart';
-import 'package:talento/Widgets/gradientText.dart';
 import 'package:talento/Views/login.dart';
 import 'package:talento/Views/register.dart';
 
@@ -27,19 +25,14 @@ class WelcomeScreen extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     Image.asset(
-                      'assets/images/sphere.png', 
+                      'assets/Images/sphere.png', 
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Image.asset(
-                          'assets/images/logo.png',
-                          height: 60,
-                        ),
-                        const SizedBox(height: 10),
-                        GradientText(
-                          text: "Talento",
-                          style: FontStyles.header(context),
+                          'assets/Images/logo.png',
+                          height: 100,
                         ),
                       ],
                     ),
@@ -58,6 +51,8 @@ class WelcomeScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
                 },
+                height: 60,
+                width: double.infinity,
               ),
               const SizedBox(height: 16),
 
@@ -70,6 +65,8 @@ class WelcomeScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) =>  Register()),
                   );
                 },
+                height: 60,
+                width: double.infinity,
               ),
 
               const Spacer(flex: 1),

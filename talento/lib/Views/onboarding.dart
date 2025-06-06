@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talento/Utils/appColors.dart';
 import 'package:talento/Utils/appFonts.dart';
 import 'package:talento/Views/welcome.dart';
+import 'package:talento/utils/appStrings.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -17,13 +18,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> onboardingData = [
     {
       'image': 'assets/Images/onboard1.png',
-      'title': 'Talent is everywhere,\nFind it with Talento',
+      'title': AppStrings.onboardHeading1,
       'curve': 'assets/Images/curve1.png',
       'imageSide': 'right',
     },
     {
       'image': 'assets/Images/onboard2.png',
-      'title': 'Create,\nConnect,\nCollaborate.\nAll on Talento',
+      'title': AppStrings.onboardHeading2,
       'curve': 'assets/Images/curve2.png',
       'imageSide': 'left',
     },
@@ -72,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 // Page indicator dots
                 Positioned(
-                  bottom: 120,
+                  bottom: 130,
                   left: 0,
                   right: 0,
                   child: Row(
@@ -81,14 +82,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onboardingData.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 6),
-                        width: _currentPage == index ? 20 : 8,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentPage == index ? 30 : 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          gradient:
-                              _currentPage == index ? AppColors.gradient : null,
+                          // gradient:
+                          //     _currentPage == index ? AppColors.gradient : null,
                           color:
-                              _currentPage == index ? null : Colors.white70,
+                              _currentPage == index ? AppColors.white : Colors.white70,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -97,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 // Next button
                 Positioned(
-                  bottom: 40,
+                  bottom: 30,
                   left: 0,
                   right: 0,
                   child: Center(
@@ -107,8 +108,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         alignment: Alignment.center,
                         children: [
                           Container(
-                            width: 70,
-                            height: 70,
+                            width: 80,
+                            height: 80,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
@@ -117,17 +118,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           Container(
-                            width: 60,
-                            height: 60,
+                            width: 65,
+                            height: 65,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: AppColors.gradient,
-                              border:
-                                  Border.all(color: Colors.white, width: 2),
+                              border: Border.all(
+                                  color: Colors.white.withOpacity(0.75),
+                                  width: 2),
                             ),
-                            child: const Center(
-                              child: Icon(Icons.arrow_forward,
-                                  color: Colors.white, size: 26),
+                          ),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.white
+                            ),
+                            child:  Center(
+                              child: ShaderMask(
+  shaderCallback: (Rect bounds) {
+    return AppColors.gradient.createShader(bounds);
+  },
+  blendMode: BlendMode.srcIn,
+  child: Icon(
+    Icons.arrow_forward_rounded,
+    size: 26,
+    color: Colors.white, // This will be overridden by the gradient
+  ),
+),
+
                             ),
                           ),
                         ],
@@ -172,14 +191,15 @@ class OnboardPage extends StatelessWidget {
           right: isImageRight ? null : 0,
           child: Image.asset(
             curveImage,
-            width: size.width * 0.65,
+            width: size.width * 0.5,
+            height: size.height * 0.75,
             fit: BoxFit.fitHeight,
           ),
         ),
         // Foreground content: Image and Text
         Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -189,20 +209,31 @@ class OnboardPage extends StatelessWidget {
                       : Alignment.centerLeft,
                   child: Image.asset(
                     image,
-                    height: size.height * 0.4,
+                    height: size.height * 0.2,
                     fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(height: 30),
-                Text(
-                  '"$title"',
-                  textAlign: TextAlign.center,
-                  style: FontStyles.header(context).copyWith(
-                    color: Colors.white,
-                    fontSize: size.width < 600 ? 20 : 24,
-                    fontWeight: FontWeight.w600,
+                Align(
+                  alignment: isImageRight
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: size.width * 0.5, // Set the max width you want
+                    ),
+                    child: Text(
+                      '"$title"',
+                      textAlign: TextAlign.left,
+                      style: FontStyles.header(context).copyWith(
+                        color: Colors.white,
+                        fontSize: size.width < 600 ? 32 : 24,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
+                )
+
               ],
             ),
           ),

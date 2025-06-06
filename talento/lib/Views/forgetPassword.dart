@@ -45,7 +45,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -92,6 +92,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               GradientButton(
                 label: "Send Code",
                 onPressed: _sendResetLink,
+                height: 60,
+                width: double.infinity,
               ),
 
               const Spacer(),
@@ -123,7 +125,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
             ],
           ),
         ),

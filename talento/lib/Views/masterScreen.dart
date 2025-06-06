@@ -1,9 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:talento/Utils/appColors.dart';
 import 'package:talento/Views/feedScreen.dart';
+import 'package:talento/Views/profileScreen.dart';
 import 'package:talento/Views/uploadPost.dart';
+import 'package:talento/utils/appColors.dart';
 
 class MasterScreen extends StatefulWidget {
   const MasterScreen({super.key});
@@ -14,10 +15,9 @@ class MasterScreen extends StatefulWidget {
 
 class _MasterScreenState extends State<MasterScreen> {
   int _selectedIndex = 0;
-
   final List<Widget> _screens = [
     FeedScreen(),
-    ProfileScreen(),
+    ProfileScreen(userId: FirebaseAuth.instance.currentUser?.uid),
   ];
 
   void _onItemTapped(int index) {
@@ -35,85 +35,90 @@ class _MasterScreenState extends State<MasterScreen> {
         shape: const CircularNotchedRectangle(),
         color: AppColors.white,
         notchMargin: 12.0,
-        elevation: 10,
         child: SizedBox(
-          height: 70,
+          height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              _buildIconButton('assets/Icons/home.png', 0),
+              _buildNavItem('assets/Icons/home.svg', 'Home', 0),
               const SizedBox(width: 40),
-              _buildIconButton('assets/Icons/profile.png', 3),
+              _buildNavItem('assets/Icons/user.svg', 'Profile', 1),
             ],
           ),
         ),
       ),
       floatingActionButton: GestureDetector(
         onTap: () {
-          final currentUser = FirebaseAuth.instance.currentUser;
-          final currentUserId = currentUser?.uid ?? '';
-
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  UploadPostScreen(currentUserId: currentUserId),
-            ),
+            MaterialPageRoute(builder: (context) => UploadPostScreen(currentUserId: FirebaseAuth.instance.currentUser?.uid,)),
           );
         },
-        child: Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: AppColors.gradient,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
+          child: Container(
+            height: 70,
+            width: 70,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: AppColors.gradient,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.add, color: Colors.white),
           ),
-          child: const Icon(Icons.add, color: Colors.white),
         ),
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  Widget _buildIconButton(String assetPath, int index) {
+  Widget _buildNavItem(String assetPath, String label, int index) {
     final isSelected = _selectedIndex == index;
+    final gradient = AppColors.gradient;
 
     return GestureDetector(
       onTap: () => _onItemTapped(index),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-        child: ShaderMask(
-          shaderCallback: (bounds) => isSelected
-              ? AppColors.gradient.createShader(bounds)
-              : const LinearGradient(colors: [Colors.grey, Colors.grey])
-                  .createShader(bounds),
-          blendMode: BlendMode.srcIn,
-          child: SvgPicture.asset(
-            assetPath,
-            height: 26,
-            width: 26,
-            colorFilter: isSelected
-                ? null
-                : const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ShaderMask(
+            shaderCallback: (bounds) => isSelected
+                ? gradient.createShader(bounds)
+                : const LinearGradient(colors: [Colors.grey, Colors.grey])
+                    .createShader(bounds),
+            blendMode: BlendMode.srcIn,
+            child: SvgPicture.asset(
+              assetPath,
+              height: 24,
+              width: 24,
+              colorFilter: isSelected
+                  ? null
+                  : const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+            ),
           ),
-        ),
+          const SizedBox(height: 4),
+          isSelected
+              ? ShaderMask(
+                  shaderCallback: (bounds) => gradient.createShader(bounds),
+                  blendMode: BlendMode.srcIn,
+                  child: Text(
+                    label,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                )
+              : Text(
+                  label,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                )
+        ],
       ),
     );
   }
 }
 
-// Dummy Profile Screen for testing
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) =>
-      const Center(child: Text('Profile Screen'));
-}
+

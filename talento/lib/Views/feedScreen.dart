@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talento/Models/postModel.dart';
 import 'package:talento/Utils/appColors.dart';
-import 'package:talento/Views/uploadPost.dart';
+import 'package:talento/Views/chat_screen.dart';
 import 'package:talento/Widgets/postCardWidget.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -68,12 +68,22 @@ class _FeedScreenState extends State<FeedScreen> {
             fontSize: 24,
           ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.chat_bubble_outline, color: Colors.orange),
+        actions: [
+  Padding(
+    padding: const EdgeInsets.only(right: 16),
+    child: IconButton(
+      icon: const Icon(Icons.chat_bubble_outline, color: Colors.orange),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(),
           ),
-        ],
+        );
+      },
+    ),
+  ),
+],
       ),
       body: Column(
         children: [
@@ -112,7 +122,7 @@ class _FeedScreenState extends State<FeedScreen> {
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
+                                    vertical: 8),
                                 child: PostCard(post: _posts[index]),
                               );
                             },
@@ -120,43 +130,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   ),
           ),
         ],
-      ),
-
-      /// --- Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const UploadPostScreen()),
-            );
-          }
-          // Add more navigation handling for index 0 and 2 as needed
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: CircleAvatar(
-              backgroundColor: Colors.orange,
-              radius: 16,
-              child: Icon(Icons.add, color: Colors.white, size: 20),
-            ),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: "Profile",
-          ),
-        ],
-      ),
+      )
     );
   }
 }
