@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talento/Views/splash.dart';
+import 'package:talento/Views/masterScreen.dart';
+import 'package:talento/Views/onboarding.dart';
 import 'package:talento/firebase_options.dart';
 import 'package:talento/providers/userProvider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -47,23 +50,28 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   timeago.setLocaleMessages('en', CustomEnMessages());
-  runApp(MyApp(prefs: prefs,));
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
 
-  MyApp({super.key, required this.prefs});
+  const MyApp({super.key, required this.prefs});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        StreamProvider<User?>(
+          create: (_) => FirebaseAuth.instance.authStateChanges(),
+          initialData: null,
+        ),
       ],
       child: MaterialApp(
         title: 'Talento',
         debugShowCheckedModeBanner: false,
-        home: SplashScreen(),
+        home: const SplashScreen(),
       ),
     );
   }

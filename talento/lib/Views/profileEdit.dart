@@ -60,19 +60,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String coverPhotoUrl = widget.user.coverPhotoUrl;
 
     if (profileImageFile != null) {
-      profilePhotoUrl = await uploadImage(profileImageFile!, 'profilePhotos/${widget.user.id}.jpg');
+      profilePhotoUrl = await uploadImage(
+        profileImageFile!,
+        'profilePhotos/${widget.user.id}.jpg',
+      );
     }
     if (coverImageFile != null) {
-      coverPhotoUrl = await uploadImage(coverImageFile!, 'coverPhotos/${widget.user.id}.jpg');
+      coverPhotoUrl = await uploadImage(
+        coverImageFile!,
+        'coverPhotos/${widget.user.id}.jpg',
+      );
     }
 
-    await FirebaseFirestore.instance.collection('TalentoUsers').doc(widget.user.id).update({
-      'fullName': fullNameController.text.trim(),
-      'username': usernameController.text.trim(),
-      'bio': bioController.text.trim(),
-      'profilePhotoUrl': profilePhotoUrl,
-      'coverPhotoUrl': coverPhotoUrl,
-    });
+    await FirebaseFirestore.instance
+        .collection('TalentoUsers')
+        .doc(widget.user.id)
+        .update({
+          'fullName': fullNameController.text.trim(),
+          'username': usernameController.text.trim(),
+          'bio': bioController.text.trim(),
+          'profilePhotoUrl': profilePhotoUrl,
+          'coverPhotoUrl': coverPhotoUrl,
+        });
 
     setState(() => isLoading = false);
     if (mounted) Navigator.pop(context, true);
@@ -83,16 +92,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: CustomAppBar(
-  title: 'Edit Profile',
-  action: GradientButton(
-    label: isLoading ? "Saving..." : "Save",
-    height: 30,
-    width: 80,
-    borderRadius: 20,
-    textSize: 12,
-    onPressed: saveProfile,
-  ),
-),
+        title: 'Edit Profile',
+        action: GradientButton(
+          label: isLoading ? "Saving..." : "Save",
+          height: 30,
+          width: 80,
+          borderRadius: 20,
+          textSize: 12,
+          onPressed: saveProfile,
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -111,11 +120,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       borderRadius: BorderRadius.circular(16),
                       color: Colors.grey[300],
                       image: DecorationImage(
-                        image: coverImageFile != null
-                            ? FileImage(coverImageFile!)
-                            : (widget.user.coverPhotoUrl.isNotEmpty
-                                ? NetworkImage(widget.user.coverPhotoUrl)
-                                : const AssetImage('assets/Images/user.png')) as ImageProvider,
+                        image:
+                            coverImageFile != null
+                                ? FileImage(coverImageFile!)
+                                : (widget.user.coverPhotoUrl.isNotEmpty
+                                        ? NetworkImage(
+                                          widget.user.coverPhotoUrl,
+                                        )
+                                        : const AssetImage(
+                                          'assets/images/user.png',
+                                        ))
+                                    as ImageProvider,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -125,7 +140,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: CircleAvatar(
                           backgroundColor: Colors.black54,
-                          child: const Icon(Icons.camera_alt, color: Colors.white),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -138,17 +156,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: CircleAvatar(
                       radius: 48,
                       backgroundColor: Colors.white,
-                      backgroundImage: profileImageFile != null
-                          ? FileImage(profileImageFile!)
-                          : (widget.user.profilePhotoUrl.isNotEmpty
-                              ? NetworkImage(widget.user.profilePhotoUrl)
-                              : const AssetImage('assets/Images/user.png')) as ImageProvider,
+                      backgroundImage:
+                          profileImageFile != null
+                              ? FileImage(profileImageFile!)
+                              : (widget.user.profilePhotoUrl.isNotEmpty
+                                      ? NetworkImage(
+                                        widget.user.profilePhotoUrl,
+                                      )
+                                      : const AssetImage(
+                                        'assets/images/user.png',
+                                      ))
+                                  as ImageProvider,
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.black54,
-                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),

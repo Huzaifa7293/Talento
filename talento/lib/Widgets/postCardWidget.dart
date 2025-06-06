@@ -43,10 +43,11 @@ class _PostCardState extends State<PostCard> {
 
   Future<void> fetchUserInfo(String userId) async {
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('TalentoUsers')
-          .doc(userId)
-          .get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('TalentoUsers')
+              .doc(userId)
+              .get();
       if (doc.exists) {
         final data = doc.data()!;
         setState(() {
@@ -78,20 +79,27 @@ class _PostCardState extends State<PostCard> {
             child: Column(
               children: [
                 const SizedBox(height: 12),
-                const Text('Comments', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const Text(
+                  'Comments',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
                 const Divider(),
                 Expanded(
                   child: StreamBuilder<DocumentSnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('TalentoPosts')
-                        .doc(postId)
-                        .snapshots(),
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('TalentoPosts')
+                            .doc(postId)
+                            .snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      final data = snapshot.data!.data() as Map<String, dynamic>;
-                      final comments = List<Map<String, dynamic>>.from(data['comments'] ?? []);
+                      final data =
+                          snapshot.data!.data() as Map<String, dynamic>;
+                      final comments = List<Map<String, dynamic>>.from(
+                        data['comments'] ?? [],
+                      );
                       if (comments.isEmpty) {
                         return const Center(child: Text('No comments yet'));
                       }
@@ -101,20 +109,37 @@ class _PostCardState extends State<PostCard> {
                           final comment = comments[comments.length - 1 - index];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundImage: comment['userPhoto'] != null && comment['userPhoto'] != ""
-                                  ? NetworkImage(comment['userPhoto'])
-                                  : const AssetImage('assets/Images/user.png') as ImageProvider,
+                              backgroundImage:
+                                  comment['userPhoto'] != null &&
+                                          comment['userPhoto'] != ""
+                                      ? NetworkImage(comment['userPhoto'])
+                                      : const AssetImage(
+                                            'assets/images/user.png',
+                                          )
+                                          as ImageProvider,
                             ),
-                            title: Text(comment['username'] ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            title: Text(
+                              comment['username'] ?? 'User',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             subtitle: Text(comment['text'] ?? ''),
                             trailing: Text(
                               comment['timestamp'] != null
                                   ? timeago.format(
-                                      (comment['timestamp'] as Timestamp?)?.toDate() ??
-                                      DateTime.tryParse(comment['timestamp'].toString()) ??
-                                      DateTime.now())
+                                    (comment['timestamp'] as Timestamp?)
+                                            ?.toDate() ??
+                                        DateTime.tryParse(
+                                          comment['timestamp'].toString(),
+                                        ) ??
+                                        DateTime.now(),
+                                  )
                                   : 'Just now',
-                              style: const TextStyle(fontSize: 11, color: Colors.grey),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                              ),
                             ),
                           );
                         },
@@ -132,7 +157,10 @@ class _PostCardState extends State<PostCard> {
                           decoration: const InputDecoration(
                             hintText: 'Add a comment...',
                             border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                           ),
                         ),
                       ),
@@ -143,7 +171,11 @@ class _PostCardState extends State<PostCard> {
                           if (text.isEmpty) return;
                           final user = FirebaseAuth.instance.currentUser;
                           if (user == null) return;
-                          final userDoc = await FirebaseFirestore.instance.collection('TalentoUsers').doc(user.uid).get();
+                          final userDoc =
+                              await FirebaseFirestore.instance
+                                  .collection('TalentoUsers')
+                                  .doc(user.uid)
+                                  .get();
                           final userData = userDoc.data() ?? {};
                           final commentData = {
                             'userId': user.uid,
@@ -156,12 +188,14 @@ class _PostCardState extends State<PostCard> {
                               .collection('TalentoPosts')
                               .doc(postId)
                               .update({
-                            'comments': FieldValue.arrayUnion([commentData]),
-                            'commentCount': FieldValue.increment(1),
-                            'commentBy': FieldValue.arrayUnion([
-                              {'uid': user.uid, 'comment': text}
-                            ]),
-                          });
+                                'comments': FieldValue.arrayUnion([
+                                  commentData,
+                                ]),
+                                'commentCount': FieldValue.increment(1),
+                                'commentBy': FieldValue.arrayUnion([
+                                  {'uid': user.uid, 'comment': text},
+                                ]),
+                              });
                           commentController.clear();
                         },
                       ),
@@ -201,19 +235,24 @@ class _PostCardState extends State<PostCard> {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24),
                 ),
-                child: widget.post.type == 'video'
-                    ? PostVideoPlayer(
-  url: widget.post.mediaUrl,
-  autoPlay: false, // set to true if you want video to play automatically
-  showControls: true, // set to false if you want minimal controls
-  aspectRatio: 1/1, // adjust based on your video's aspect ratio
-)
-                    : Image.network(
-                        widget.post.mediaUrl,
-                        height: 360,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+                child:
+                    widget.post.type == 'video'
+                        ? AspectRatio(
+                          aspectRatio:
+                              9 / 16, // Instagram-style vertical video ratio
+                          child: PostVideoPlayer(
+                            url: widget.post.mediaUrl,
+                            autoPlay: true,
+                            showControls: true,
+                            aspectRatio: 9 / 16,
+                          ),
+                        )
+                        : Image.network(
+                          widget.post.mediaUrl,
+                          height: MediaQuery.of(context).size.width,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
               ),
               // User Info (Top Left)
               Positioned(
@@ -224,7 +263,8 @@ class _PostCardState extends State<PostCard> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfileScreen(userId: widget.post.uId),
+                        builder:
+                            (context) => ProfileScreen(userId: widget.post.uId),
                       ),
                     );
                   },
@@ -277,24 +317,33 @@ class _PostCardState extends State<PostCard> {
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
-                        builder: (context) => SafeArea(
-                          child: ListTile(
-                            leading: const Icon(Icons.delete, color: Colors.red),
-                            title: const Text('Delete', style: TextStyle(color: Colors.red)),
-                            onTap: () async {
-                              Navigator.pop(context);
-                              await FirebaseFirestore.instance
-                                  .collection('TalentoPosts')
-                                  .doc(widget.post.postId)
-                                  .delete();
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Post deleted')),
-                                );
-                              }
-                            },
-                          ),
-                        ),
+                        builder:
+                            (context) => SafeArea(
+                              child: ListTile(
+                                leading: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                title: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                  await FirebaseFirestore.instance
+                                      .collection('TalentoPosts')
+                                      .doc(widget.post.postId)
+                                      .delete();
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Post deleted'),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
                       );
                     },
                   ),
@@ -318,18 +367,23 @@ class _PostCardState extends State<PostCard> {
                         ),
                         const SizedBox(width: 15),
                         StreamBuilder<DocumentSnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('TalentoPosts')
-                              .doc(widget.post.postId)
-                              .snapshots(),
+                          stream:
+                              FirebaseFirestore.instance
+                                  .collection('TalentoPosts')
+                                  .doc(widget.post.postId)
+                                  .snapshots(),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
                               return const Text(
                                 '0',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
                               );
                             }
-                            final data = snapshot.data!.data() as Map<String, dynamic>;
+                            final data =
+                                snapshot.data!.data() as Map<String, dynamic>;
                             final commentCount = data['commentCount'] ?? 0;
                             return Text(
                               '$commentCount',
@@ -347,25 +401,27 @@ class _PostCardState extends State<PostCard> {
                       size: 48,
                       isLiked: isLiked,
                       likeCount: likeCount,
-                      likeBuilder: (isLiked) => Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          gradient: AppColors.gradient,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      countBuilder: (count, isLiked, text) => Text(
-                        '${count ?? 0}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                        ),
-                      ),
+                      likeBuilder:
+                          (isLiked) => Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: AppColors.gradient,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                      countBuilder:
+                          (count, isLiked, text) => Text(
+                            '${count ?? 0}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
                       onTap: (isLikedNow) async {
                         final user = FirebaseAuth.instance.currentUser;
                         if (user == null) return !isLikedNow;
@@ -419,14 +475,21 @@ class _PostCardState extends State<PostCard> {
                       decoration: const InputDecoration(
                         hintText: 'Add a comment...',
                         border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                       onSubmitted: (text) async {
                         final trimmed = text.trim();
                         if (trimmed.isEmpty) return;
                         final user = FirebaseAuth.instance.currentUser;
                         if (user == null) return;
-                        final userDoc = await FirebaseFirestore.instance.collection('TalentoUsers').doc(user.uid).get();
+                        final userDoc =
+                            await FirebaseFirestore.instance
+                                .collection('TalentoUsers')
+                                .doc(user.uid)
+                                .get();
                         final userData = userDoc.data() ?? {};
                         final commentData = {
                           'userId': user.uid,
@@ -439,12 +502,12 @@ class _PostCardState extends State<PostCard> {
                             .collection('TalentoPosts')
                             .doc(widget.post.postId)
                             .update({
-                          'comments': FieldValue.arrayUnion([commentData]),
-                          'commentCount': FieldValue.increment(1),
-                          'commentBy': FieldValue.arrayUnion([
-                            {'uid': user.uid, 'comment': trimmed}
-                          ]),
-                        });
+                              'comments': FieldValue.arrayUnion([commentData]),
+                              'commentCount': FieldValue.increment(1),
+                              'commentBy': FieldValue.arrayUnion([
+                                {'uid': user.uid, 'comment': trimmed},
+                              ]),
+                            });
                         commentController.clear();
                       },
                     ),
@@ -456,7 +519,11 @@ class _PostCardState extends State<PostCard> {
                       if (text.isEmpty) return;
                       final user = FirebaseAuth.instance.currentUser;
                       if (user == null) return;
-                      final userDoc = await FirebaseFirestore.instance.collection('TalentoUsers').doc(user.uid).get();
+                      final userDoc =
+                          await FirebaseFirestore.instance
+                              .collection('TalentoUsers')
+                              .doc(user.uid)
+                              .get();
                       final userData = userDoc.data() ?? {};
                       final commentData = {
                         'userId': user.uid,
@@ -469,12 +536,12 @@ class _PostCardState extends State<PostCard> {
                           .collection('TalentoPosts')
                           .doc(widget.post.postId)
                           .update({
-                        'comments': FieldValue.arrayUnion([commentData]),
-                        'commentCount': FieldValue.increment(1),
-                        'commentBy': FieldValue.arrayUnion([
-                          {'uid': user.uid, 'comment': text}
-                        ]),
-                      });
+                            'comments': FieldValue.arrayUnion([commentData]),
+                            'commentCount': FieldValue.increment(1),
+                            'commentBy': FieldValue.arrayUnion([
+                              {'uid': user.uid, 'comment': text},
+                            ]),
+                          });
                       commentController.clear();
                     },
                   ),
@@ -488,7 +555,6 @@ class _PostCardState extends State<PostCard> {
   }
 }
 
-
 class PostVideoPlayer extends StatefulWidget {
   final String url;
   final bool autoPlay;
@@ -497,7 +563,7 @@ class PostVideoPlayer extends StatefulWidget {
 
   const PostVideoPlayer({
     required this.url,
-    this.autoPlay = false,
+    this.autoPlay = true,
     this.showControls = true,
     this.aspectRatio = 16 / 9,
     Key? key,
@@ -507,61 +573,75 @@ class PostVideoPlayer extends StatefulWidget {
   State<PostVideoPlayer> createState() => _PostVideoPlayerState();
 }
 
-class _PostVideoPlayerState extends State<PostVideoPlayer> {
+class _PostVideoPlayerState extends State<PostVideoPlayer>
+    with SingleTickerProviderStateMixin {
   late VideoPlayerController _controller;
   Future<void>? _initializeVideoPlayerFuture;
   bool _isPlaying = false;
+  bool _isMuted = true;
   bool _showControls = false;
   bool _isBuffering = false;
   bool _hasError = false;
   bool _isInitialized = false;
-  Duration _currentPosition = Duration.zero;
-  Duration _totalDuration = Duration.zero;
+  late AnimationController _progressController;
+  Timer? _controlsTimer;
+  bool _isDoubleTapEnabled = false;
+  DateTime? _lastTapTime;
 
   @override
   void initState() {
     super.initState();
+    _progressController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     _initializeVideo();
   }
 
   void _initializeVideo() {
-    _controller = VideoPlayerController.network(widget.url)
-      ..addListener(_videoListener);
+    _controller =
+        VideoPlayerController.network(widget.url)
+          ..setLooping(true)
+          ..setVolume(0.0)
+          ..addListener(_videoListener);
 
-    _initializeVideoPlayerFuture = _controller.initialize().then((_) {
-      if (mounted) {
-        setState(() {
-          _isInitialized = true;
-          _totalDuration = _controller.value.duration;
+    _initializeVideoPlayerFuture = _controller
+        .initialize()
+        .then((_) {
+          if (mounted) {
+            setState(() {
+              _isInitialized = true;
+              _isDoubleTapEnabled = true;
+            });
+            if (widget.autoPlay) {
+              _controller.play();
+              _isPlaying = true;
+            }
+          }
+        })
+        .catchError((error) {
+          if (mounted) {
+            setState(() {
+              _hasError = true;
+            });
+          }
+          debugPrint('Video player error: $error');
         });
-        if (widget.autoPlay) {
-          _controller.play();
-          _isPlaying = true;
-        }
-      }
-    }).catchError((error) {
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-        });
-      }
-      debugPrint('Video player error: $error');
-    });
   }
 
   void _videoListener() {
     if (!mounted) return;
-    
+
+    final progress =
+        _controller.value.position.inMilliseconds /
+        (_controller.value.duration.inMilliseconds == 0
+            ? 1
+            : _controller.value.duration.inMilliseconds);
+    _progressController.value = progress;
+
     setState(() {
       _isPlaying = _controller.value.isPlaying;
       _isBuffering = _controller.value.isBuffering;
-      _currentPosition = _controller.value.position;
-      _totalDuration = _controller.value.duration;
-      
-      // Show controls when buffering
-      if (_isBuffering) {
-        _showControls = true;
-      }
     });
   }
 
@@ -569,64 +649,63 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> {
     setState(() {
       if (_controller.value.isPlaying) {
         _controller.pause();
-        _isPlaying = false;
       } else {
         _controller.play();
-        _isPlaying = true;
       }
       _showControls = true;
     });
-    
-    // Hide controls after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
+    _startControlsTimer();
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      _controller.setVolume(_isMuted ? 0.0 : 1.0);
+    });
+    _startControlsTimer();
+  }
+
+  void _startControlsTimer() {
+    _controlsTimer?.cancel();
+    _controlsTimer = Timer(const Duration(seconds: 2), () {
       if (mounted && !_isBuffering) {
         setState(() => _showControls = false);
       }
     });
   }
 
-  void _seekTo(Duration position) {
-    _controller.seekTo(position);
-    if (!_isPlaying) {
-      _controller.pause();
+  void _handleDoubleTap(TapDownDetails details) {
+    if (!_isDoubleTapEnabled) return;
+
+    final now = DateTime.now();
+    if (_lastTapTime != null &&
+        now.difference(_lastTapTime!) < const Duration(milliseconds: 300)) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final tapPosition = details.globalPosition.dx;
+
+      if (tapPosition < screenWidth / 2) {
+        // Double tap on left - rewind 10 seconds
+        final newPosition =
+            _controller.value.position - const Duration(seconds: 10);
+        _controller.seekTo(newPosition);
+      } else {
+        // Double tap on right - forward 10 seconds
+        final newPosition =
+            _controller.value.position + const Duration(seconds: 10);
+        _controller.seekTo(newPosition);
+      }
+      _showControls = true;
+      _startControlsTimer();
     }
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    
-    return [
-      if (duration.inHours > 0) hours,
-      minutes,
-      seconds,
-    ].join(':');
-  }
-
-  void _showFullScreen() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
-          body: Center(
-            child: PostVideoPlayer(
-              url: widget.url,
-              autoPlay: true,
-              showControls: true,
-              aspectRatio: _controller.value.aspectRatio,
-            ),
-          ),
-        ),
-      ),
-    );
+    _lastTapTime = now;
   }
 
   @override
   void dispose() {
+    _controlsTimer?.cancel();
     _controller.removeListener(_videoListener);
     _controller.dispose();
+    _progressController.dispose();
     super.dispose();
   }
 
@@ -641,124 +720,143 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> {
     }
 
     return GestureDetector(
+      onTapDown: _handleDoubleTap,
       onTap: () {
-        if (widget.showControls) {
-          setState(() => _showControls = !_showControls);
-        }
+        _togglePlayPause();
+        setState(() => _showControls = true);
+        _startControlsTimer();
       },
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Video player
-          AspectRatio(
-            aspectRatio: widget.aspectRatio,
-            child: VideoPlayer(_controller),
+          // Video player with proper sizing
+          SizedBox(
+            width: double.infinity,
+            child: AspectRatio(
+              aspectRatio: widget.aspectRatio,
+              child: VideoPlayer(_controller),
+            ),
           ),
+
+          // Dark overlay when controls are shown
+          if (_showControls)
+            Container(
+              decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+            ),
+
+          // Progress bar at top
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedBuilder(
+              animation: _progressController,
+              builder: (context, child) {
+                return LinearProgressIndicator(
+                  value: _progressController.value,
+                  backgroundColor: Colors.grey[800]?.withOpacity(0.5),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  minHeight: 3,
+                );
+              },
+            ),
+          ),
+
+          // Double tap indicators
+          if (_showControls)
+            Positioned.fill(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 100,
+                    height: double.infinity,
+                    color: Colors.transparent,
+                    child: const Center(
+                      child: Icon(
+                        Icons.fast_rewind,
+                        color: Colors.white54,
+                        size: 40,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    width: 100,
+                    height: double.infinity,
+                    color: Colors.transparent,
+                    child: const Center(
+                      child: Icon(
+                        Icons.fast_forward,
+                        color: Colors.white54,
+                        size: 40,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           // Buffering indicator
           if (_isBuffering)
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-
-          // Play/pause overlay
-          if (!_isPlaying && !_showControls)
-            Icon(
-              Icons.play_circle_filled,
-              color: Colors.white.withOpacity(0.8),
-              size: 64,
-            ),
-
-          // Controls overlay
-          if (widget.showControls && _showControls)
-            _buildControlsOverlay(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildControlsOverlay() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0.7),
-            Colors.transparent,
-            Colors.transparent,
-            Colors.black.withOpacity(0.7),
-          ],
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Top controls
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.fullscreen, color: Colors.white),
-                onPressed: _showFullScreen,
+            Container(
+              decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  strokeWidth: 2,
+                ),
               ),
-            ],
-          ),
-
-          // Center play/pause button
-          IconButton(
-            icon: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.white,
-              size: 48,
             ),
-            onPressed: _togglePlayPause,
+
+          // Play/Pause overlay - Always create the widget but control opacity
+          Center(
+            child: AnimatedOpacity(
+              opacity: _showControls ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: GestureDetector(
+                onTap: _togglePlayPause,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                  child: Icon(
+                    _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+              ),
+            ),
           ),
 
-          // Bottom controls
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                // Progress bar
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: Colors.red,
-                    inactiveTrackColor: Colors.grey,
-                    trackHeight: 2,
-                    thumbColor: Colors.red,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                    overlayColor: Colors.red.withAlpha(32),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-                  ),
-                  child: Slider(
-                    value: _currentPosition.inSeconds.toDouble(),
-                    min: 0,
-                    max: _totalDuration.inSeconds.toDouble(),
-                    onChanged: (value) {
-                      _seekTo(Duration(seconds: value.toInt()));
-                    },
-                  ),
+          // Mute/Unmute button
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: AnimatedOpacity(
+              opacity: _showControls ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-
-                // Time indicators
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _formatDuration(_currentPosition),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        _formatDuration(_totalDuration),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ],
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: Icon(
+                    _isMuted ? Icons.volume_off : Icons.volume_up,
+                    color: Colors.white,
+                    size: 20,
                   ),
+                  onPressed: _toggleMute,
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -770,23 +868,14 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> {
     return AspectRatio(
       aspectRatio: widget.aspectRatio,
       child: Container(
-        color: Colors.black12,
+        color: Colors.black87,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
-              const SizedBox(height: 16),
-              const Text(
-                'Failed to load video',
-                style: TextStyle(color: Colors.red),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
+              const Icon(Icons.error_outline, color: Colors.white, size: 48),
+              const SizedBox(height: 8),
+              TextButton.icon(
                 onPressed: () {
                   setState(() {
                     _hasError = false;
@@ -794,7 +883,11 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> {
                   });
                   _initializeVideo();
                 },
-                child: const Text('Retry'),
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                label: const Text(
+                  'Retry',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -807,9 +900,12 @@ class _PostVideoPlayerState extends State<PostVideoPlayer> {
     return AspectRatio(
       aspectRatio: widget.aspectRatio,
       child: Container(
-        color: Colors.black12,
+        color: Colors.black87,
         child: const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            strokeWidth: 2,
+          ),
         ),
       ),
     );

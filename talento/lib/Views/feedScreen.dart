@@ -28,10 +28,11 @@ class _FeedScreenState extends State<FeedScreen> {
     });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('TalentoPosts')
-          .orderBy('timestamp', descending: true)
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('TalentoPosts')
+              .orderBy('timestamp', descending: true)
+              .get();
 
       final postList =
           snapshot.docs.map((doc) => PostModel.fromJson(doc.data())).toList();
@@ -69,68 +70,72 @@ class _FeedScreenState extends State<FeedScreen> {
           ),
         ),
         actions: [
-  Padding(
-    padding: const EdgeInsets.only(right: 16),
-    child: IconButton(
-      icon: const Icon(Icons.chat_bubble_outline, color: Colors.orange),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatScreen(),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              icon: const Icon(Icons.chat_bubble_outline, color: Colors.orange),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                );
+              },
+            ),
           ),
-        );
-      },
-    ),
-  ),
-],
+        ],
       ),
       body: Column(
         children: [
           /// --- Search Field
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Search Here",
-                hintStyle: const TextStyle(fontSize: 14),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+          //   child: TextField(
+          //     decoration: InputDecoration(
+          //       hintText: "Search Here",
+          //       hintStyle: const TextStyle(fontSize: 14),
+          //       filled: true,
+          //       fillColor: Colors.grey[100],
+          //       contentPadding:
+          //           const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(16),
+          //         borderSide: BorderSide.none,
+          //       ),
+          //       prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          //     ),
+          //   ),
+          // ),
 
           /// --- Post Feed
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    child: _posts.isEmpty
-                        ? const Center(child: Text("No posts found."))
-                        : ListView.builder(
-                            padding: const EdgeInsets.only(top: 8, bottom: 16),
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            itemCount: _posts.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8),
-                                child: PostCard(post: _posts[index]),
-                              );
-                            },
-                          ),
-                  ),
+            child:
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      child:
+                          _posts.isEmpty
+                              ? const Center(child: Text("No posts found."))
+                              : ListView.builder(
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 16,
+                                ),
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                itemCount: _posts.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: PostCard(post: _posts[index]),
+                                  );
+                                },
+                              ),
+                    ),
           ),
         ],
-      )
+      ),
     );
   }
 }

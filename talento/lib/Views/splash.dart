@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:talento/Utils/appColors.dart';
 import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:talento/Views/onboarding.dart';
+import 'package:talento/Views/masterScreen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,13 +16,25 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    checkAuthAndNavigate();
+  }
 
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => OnboardingScreen()),
-      );
-    });
+  Future<void> checkAuthAndNavigate() async {
+    await Future.delayed(
+      const Duration(seconds: 2),
+    ); // Keep splash visible for 2 seconds
+
+    if (!mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => user != null ? MasterScreen() : OnboardingScreen(),
+      ),
+    );
   }
 
   @override
@@ -33,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/Images/logo.png',
+              'assets/images/logo.png',
               height: 150,
               fit: BoxFit.contain,
             ),

@@ -21,13 +21,16 @@ class AuthService {
         password: password,
       );
 
-      DocumentSnapshot snapshot = await _firestore
-          .collection('TalentoUsers')
-          .doc(userCredential.user!.uid)
-          .get();
+      DocumentSnapshot snapshot =
+          await _firestore
+              .collection('TalentoUsers')
+              .doc(userCredential.user!.uid)
+              .get();
 
       if (snapshot.exists) {
-        UserModel user = UserModel.fromJson(snapshot.data() as Map<String, dynamic>);
+        UserModel user = UserModel.fromJson(
+          snapshot.data() as Map<String, dynamic>,
+        );
         Provider.of<UserProvider>(context, listen: false).setUser(user);
       }
 
@@ -49,10 +52,8 @@ class AuthService {
     required BuildContext context,
   }) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       UserModel newUser = UserModel(
         id: userCredential.user!.uid,
@@ -61,14 +62,17 @@ class AuthService {
         email: email,
         password: password,
         bio: '',
-        profilePhotoUrl: 'assets/user.png',
+        profilePhotoUrl: '',
         coverPhotoUrl: '',
         postCount: 0,
         followers: [],
         following: [],
       );
 
-      await _firestore.collection('TalentoUsers').doc(newUser.id).set(newUser.toJson());
+      await _firestore
+          .collection('TalentoUsers')
+          .doc(newUser.id)
+          .set(newUser.toJson());
 
       Provider.of<UserProvider>(context, listen: false).setUser(newUser);
 

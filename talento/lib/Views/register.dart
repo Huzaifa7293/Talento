@@ -16,7 +16,8 @@ class Register extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   void _signup(BuildContext context) async {
     final fullName = _fullNameController.text.trim();
@@ -25,7 +26,11 @@ class Register extends StatelessWidget {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (fullName.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (fullName.isEmpty ||
+        username.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ToastUtils.showToast(message: "Please fill all fields");
       return;
     }
@@ -57,7 +62,7 @@ class Register extends StatelessWidget {
     if (result == null) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => MasterScreen()),  
+        MaterialPageRoute(builder: (context) => MasterScreen()),
         (Route<dynamic> route) => false,
       );
       ToastUtils.showToast(message: "Signup successful");
@@ -67,104 +72,106 @@ class Register extends StatelessWidget {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    resizeToAvoidBottomInset: false,
-    backgroundColor: AppColors.white,
-    body: SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 100),
-                  Text(
-                    AppStrings.signupHeading,
-                    style: FontStyles.header(context).copyWith(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 60),
+                    Text(
+                      AppStrings.signupHeading,
+                      style: FontStyles.header(context).copyWith(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  CustomTextField(
-                    hintText: 'Full Name',
-                    controller: _fullNameController,
-                  ),
-                  const SizedBox(height: 20),
+                    CustomTextField(
+                      hintText: 'Full Name',
+                      controller: _fullNameController,
+                    ),
+                    const SizedBox(height: 20),
 
-                  CustomTextField(
-                    hintText: 'Username',
-                    controller: _usernameController,
-                  ),
-                  const SizedBox(height: 20),
+                    CustomTextField(
+                      hintText: 'Username',
+                      controller: _usernameController,
+                    ),
+                    const SizedBox(height: 20),
 
-                  CustomTextField(
-                    hintText: 'Email',
-                    controller: _emailController,
-                  ),
-                  const SizedBox(height: 20),
+                    CustomTextField(
+                      hintText: 'Email',
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 20),
 
-                  CustomTextField(
-                    hintText: 'Password',
-                    isPassword: true,
-                    controller: _passwordController,
-                  ),
-                  const SizedBox(height: 20),
+                    CustomTextField(
+                      hintText: 'Password',
+                      isPassword: true,
+                      controller: _passwordController,
+                    ),
+                    const SizedBox(height: 20),
 
-                  CustomTextField(
-                    hintText: 'Confirm Password',
-                    isPassword: true,
-                    controller: _confirmPasswordController,
-                  ),
-                  const SizedBox(height: 40),
+                    CustomTextField(
+                      hintText: 'Confirm Password',
+                      isPassword: true,
+                      controller: _confirmPasswordController,
+                    ),
+                    const SizedBox(height: 40),
 
-                  GradientButton(
-                    label: "Register",
-                    onPressed: () => _signup(context),
-                    height: 60,
-                    width: double.infinity,
+                    GradientButton(
+                      label: "Register",
+                      onPressed: () => _signup(context),
+                      height: 60,
+                      width: double.infinity,
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom login prompt - outside of scroll view
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Already have an account? ",
+                    style: TextStyle(color: AppColors.textColor),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: Text(
+                      "Login Now",
+                      style: TextStyle(
+                        color: AppColors.orange,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-
-          // Stick-to-bottom login prompt
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Already have an account? ",
-                  style: TextStyle(color: AppColors.textColor),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  },
-                  child: Text(
-                    "Login Now",
-                    style: TextStyle(
-                      color: AppColors.orange,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

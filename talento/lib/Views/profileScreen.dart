@@ -21,10 +21,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isFollowing = false;
 
   Future<Map<String, List<String>>> fetchUserPosts(String userId) async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('TalentoPosts')
-        .where('uId', isEqualTo: userId)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('TalentoPosts')
+            .where('uId', isEqualTo: userId)
+            .get();
 
     List<String> allPosts = [];
     List<String> photoImages = [];
@@ -45,19 +46,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
-    return {
-      'all': allPosts,
-      'images': photoImages,
-      'videos': videoThumbnails,
-    };
+    return {'all': allPosts, 'images': photoImages, 'videos': videoThumbnails};
   }
 
   Future<void> checkIfFollowing(String profileUserId) async {
     if (currentUser == null) return;
-    final doc = await FirebaseFirestore.instance
-        .collection('TalentoUsers')
-        .doc(profileUserId)
-        .get();
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('TalentoUsers')
+            .doc(profileUserId)
+            .get();
     if (doc.exists) {
       final data = doc.data()!;
       final followers = List<String>.from(data['followers'] ?? []);
@@ -69,12 +67,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> followUser(String profileUserId) async {
     if (currentUser == null) return;
-    await FirebaseFirestore.instance.collection('TalentoUsers').doc(profileUserId).update({
-      'followers': FieldValue.arrayUnion([currentUser])
-    });
-    await FirebaseFirestore.instance.collection('TalentoUsers').doc(currentUser).update({
-      'following': FieldValue.arrayUnion([profileUserId])
-    });
+    await FirebaseFirestore.instance
+        .collection('TalentoUsers')
+        .doc(profileUserId)
+        .update({
+          'followers': FieldValue.arrayUnion([currentUser]),
+        });
+    await FirebaseFirestore.instance
+        .collection('TalentoUsers')
+        .doc(currentUser)
+        .update({
+          'following': FieldValue.arrayUnion([profileUserId]),
+        });
     setState(() {
       isFollowing = true;
     });
@@ -82,12 +86,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> unfollowUser(String profileUserId) async {
     if (currentUser == null) return;
-    await FirebaseFirestore.instance.collection('TalentoUsers').doc(profileUserId).update({
-      'followers': FieldValue.arrayRemove([currentUser])
-    });
-    await FirebaseFirestore.instance.collection('TalentoUsers').doc(currentUser).update({
-      'following': FieldValue.arrayRemove([profileUserId])
-    });
+    await FirebaseFirestore.instance
+        .collection('TalentoUsers')
+        .doc(profileUserId)
+        .update({
+          'followers': FieldValue.arrayRemove([currentUser]),
+        });
+    await FirebaseFirestore.instance
+        .collection('TalentoUsers')
+        .doc(currentUser)
+        .update({
+          'following': FieldValue.arrayRemove([profileUserId]),
+        });
     setState(() {
       isFollowing = false;
     });
@@ -107,7 +117,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Colors.grey.shade100,
       body: FutureBuilder<List<dynamic>>(
         future: Future.wait([
-          FirebaseFirestore.instance.collection('TalentoUsers').doc(widget.userId).get(),
+          FirebaseFirestore.instance
+              .collection('TalentoUsers')
+              .doc(widget.userId)
+              .get(),
           fetchUserPosts(widget.userId!), // <-- your method
         ]),
         builder: (context, snapshot) {
@@ -131,8 +144,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final fullName = user['fullName'] ?? '';
           final username = user['username'] ?? '';
           final bio = user['bio'] ?? '';
-          final profilePic = user['profilePhotoUrl'] ?? 'assets/Images/user.png';
-          final coverPhoto = user['coverPhotoUrl'] ?? 'assets/Images/user.png';
+          final profilePic = user['profilePhotoUrl'] ?? '';
+          final coverPhoto = user['coverPhotoUrl'] ?? '';
           final followers = user['followers']?.length ?? 0;
           final following = user['following']?.length ?? 0;
 
@@ -149,9 +162,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 right: 0,
                 child: SizedBox(
                   height: 250,
-                  child: coverPhoto == "" || coverPhoto == null
-                      ? Container(color: Colors.grey.shade300)
-                      : Image.network(coverPhoto, fit: BoxFit.cover),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
 
@@ -208,61 +222,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 15),
                       id == currentUser
                           ? GradientButton(
-                              label: "Edit Profile",
-                              onPressed: () {
-                                Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => EditProfileScreen(
-      user: UserModel.fromJson(user),
-    ),
-  ),
-);
-                              },
-                              height: 30,
-                              width: 200,
-                              textSize: 14,
-                              borderRadius: 20,
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GradientButton(
-                                  label: isFollowing ? "Unfollow" : "Follow",
-                                  onPressed: () {
-                                    if (isFollowing) {
-                                      unfollowUser(widget.userId!);
-                                    } else {
-                                      followUser(widget.userId!);
-                                    }
-                                  },
-                                  height: 30,
-                                  width: 100,
-                                  textSize: 14,
-                                  borderRadius: 20,
-                                ),
-                                const SizedBox(width: 10),
-                                GradientButton(
-                                  label: "Message",
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatDetailScreen(
-                                          peerId: widget.userId!,
-                                          peerName: fullName,
-                                          peerImage: profilePic,
-                                        ),
+                            label: "Edit Profile",
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => EditProfileScreen(
+                                        user: UserModel.fromJson(user),
                                       ),
-                                    );
-                                  },
-                                  height: 30,
-                                  width: 100,
-                                  textSize: 14,
-                                  borderRadius: 20,
                                 ),
-                              ],
-                            ),
+                              );
+                            },
+                            height: 30,
+                            width: 200,
+                            textSize: 14,
+                            borderRadius: 20,
+                          )
+                          : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GradientButton(
+                                label: isFollowing ? "Unfollow" : "Follow",
+                                onPressed: () {
+                                  if (isFollowing) {
+                                    unfollowUser(widget.userId!);
+                                  } else {
+                                    followUser(widget.userId!);
+                                  }
+                                },
+                                height: 30,
+                                width: 100,
+                                textSize: 14,
+                                borderRadius: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              GradientButton(
+                                label: "Message",
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => ChatDetailScreen(
+                                            peerId: widget.userId!,
+                                            peerName: fullName,
+                                            peerImage: profilePic,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                height: 30,
+                                width: 100,
+                                textSize: 14,
+                                borderRadius: 20,
+                              ),
+                            ],
+                          ),
 
                       const SizedBox(height: 20),
 
@@ -328,10 +344,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white,
-                      backgroundImage: profilePic.startsWith('http')
-                          ? NetworkImage(profilePic)
-                          : const AssetImage('assets/Images/user.png')
-                              as ImageProvider,
+                      backgroundImage:
+                          profilePic.startsWith('http')
+                              ? NetworkImage(profilePic)
+                              : const AssetImage('assets/images/user.png')
+                                  as ImageProvider,
                     ),
                     const SizedBox(width: 50),
 
@@ -354,48 +371,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               id == currentUser
                   ? Positioned(
-                      top: 50,
-                      right: 20,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SettingsScreen(),
-                            ),
-                          );
-                        },
-                        child: Icon(
-                          Icons.settings,
-                          color: Colors.white,
-                          size: 30,
-                          shadows: [
-                            Shadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 5),
-                          ],
-                        ),
-                      ),
-                    )
-                  : Positioned(
-                      top: 50,
-                      left: 20,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(
-                          Icons.arrow_back_rounded,
-                          color: Colors.white,
-                          size: 30,
-                          shadows: [
-                            Shadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 5),
-                          ],
-                        ),
+                    top: 50,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(),
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        Icons.settings,
+                        color: Colors.white,
+                        size: 30,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                          ),
+                        ],
                       ),
                     ),
+                  )
+                  : Positioned(
+                    top: 50,
+                    left: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: Colors.white,
+                        size: 30,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
             ],
           );
         },
